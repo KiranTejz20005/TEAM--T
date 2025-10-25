@@ -1,0 +1,32 @@
+# Lightweight development requirements (excludes heavy ML / GPU packages like torch, whisper, transformers)
+# Use this for local backend development when you don't need full ML features.
+
+fastapi==0.109.0
+uvicorn==0.27.0
+pydantic==2.5.3
+python-multipart==0.0.6
+python-dotenv==1.0.0
+
+# Database
+sqlalchemy==2.0.25
+alembic==1.13.1
+
+# API / HTTP
+httpx==0.26.0
+requests==2.31.0
+
+# Lightweight AI clients (no heavy model libs)
+openai==1.10.0
+langchain==0.1.6
+
+# Data utils
+pandas==2.2.0
+numpy==1.26.3
+python-dateutil==2.8.2
+
+# Files / async helpers
+aiofiles==23.2.1
+
+# Dev / testing
+pytest==7.4.0
+pytest-asyncio==0.23.4
