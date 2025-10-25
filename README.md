@@ -1,61 +1,38 @@
-# 🧠 FinMDA-Bot — Financial Multi-Domain AI Assistant
+# FinMDA-Bot — Financial Multi-Domain AI Assistant
 
-### An AI-powered assistant designed to simplify **financial document analysis**, **decision assistance**, and **market insights** using multi-model intelligence.
-
----
-
-## 🚩 Problem Statement
-
-Financial data is often scattered across **PDFs, Excel sheets, and market APIs**, making it difficult for analysts, startups, and individuals to extract meaningful insights efficiently.  
-Traditional systems focus only on numerical or textual data — **not both together** — resulting in:
-- Time-consuming manual report analysis  
-- Difficulty in identifying financial patterns  
-- Lack of intelligent, domain-specific AI assistance  
-
-**Goal:** Build an AI system that unifies multiple types of financial data and provides instant, explainable insights through a conversational interface.
+**One-line:** FinMDA-Bot unifies PDFs, Excel/CSV, and market data into an explainable financial analyst you can talk to — auto-extract KPIs, generate MD&A-grade narratives, run scenarios, and produce auditor-ready exports.
 
 ---
 
-## 💡 Solution Overview
-
-**FinMDA-Bot** (Financial Multi-Domain Assistant) is a unified AI-driven financial assistant that:
-- Understands **textual**, **tabular**, and **visual** data formats  
-- Performs **automated financial analysis and summarization**  
-- Provides **interactive conversational insights** for decision-making  
-
-It combines **Natural Language Processing**, **Data Analytics**, and **Visualization** to act as an intelligent analyst that can:
-- Parse and summarize reports  
-- Generate KPIs and charts  
-- Offer predictive financial insights  
+## 🚀 Project Vision
+Financial data lives in many formats (PDFs, spreadsheets, APIs). Analysts spend hours reconciling numbers and writing narrative commentary. FinMDA-Bot solves that by combining document intelligence, tabular analytics, and retrieval-augmented generation into a single conversational UX that delivers explainable, audit-ready insights.
 
 ---
 
-## 🎯 Key Features
+## ✨ Highlights — Why FinMDA-Bot stands out
+These are the **best, judge-worthy features** to include in an MVP:
 
-| Feature | Description |
-|----------|--------------|
-| 🗂️ **Document Intelligence** | Upload PDFs, Excel, or CSV files — auto-extracts financial data and KPIs |
-| 💬 **Conversational Insights** | Ask natural-language questions like “What’s the profit trend this year?” |
-| 📊 **AI-Driven Analytics** | Generates ratio analysis, trend predictions, and performance charts |
-| 🔍 **Multi-Domain Finance** | Supports corporate, personal, and investment finance |
-| 🔐 **Privacy-Focused** | Local data processing with optional offline mode |
+### Core features
+- **Document Intelligence:** Robust PDF/Excel/CSV parsing, table extraction, and schema validation.
+- **KPI Engine:** Compute Revenue Growth, Gross Margin, Net Margin, ROE, EPS, Debt/Equity, Operating Cash Flow Ratio — with traceable source cells.
+- **Conversational Interface (“Ask the Report”):** Natural-language Q&A on uploaded datasets and generated narratives.
+- **RAG Grounding:** Seeded vector store + retrieval so every factual claim can be supported by a source snippet.
+- **Reality Checker (Numeric Validator):** Cross-check every numeric mention against source data; flag discrepancies above threshold.
+- **Audit Trail Sentence Provenance:** Click any sentence to view the supporting cell/Doc snippet + confidence score.
+
+### High-impact extensions
+- **Peer Benchmarking:** Auto-inject “vs. peers” commentary and percentile ranks.
+- **Scenario Builder:** Base/Upside/Downside sliders that regenerate outlook sections with sensitivity tables.
+- **Tone Slider:** Re-generate text with a management-tone setting (Conservative → Neutral → Bullish).
+- **CFO One-Page Talking Points:** Bullet list + 60-second earnings script for execs.
+
+### Additional capabilities
+- DOCX/PDF export with tracked changes + audit package  
+- Local LLM fallback (llama.cpp) for offline mode  
+- Voice summaries (TTS)  
+- Multi-user collaboration & versioning  
+- Automated regulatory mapping (SEC Item alignment)
 
 ---
 
-## 🏗️ System Architecture
-
-
----
-
-## 🧩 Tech Stack
-
-| Layer | Tools / Libraries |
-|-------|-------------------|
-| **Frontend** | React |
-| **Backend** | Python (FastAPI) |
-| **AI Models** | OpenAI / Hugging Face / Llama 3 |
-| **Data Handling** | Pandas, PyMuPDF, OpenPyXL |
-| **Visualization** | Matplotlib, Plotly |
-| **Database** | SQLite / PostgreSQL |
-| **Deployment** | Render |
-
+## 🧩 System Architecture (conceptual)
