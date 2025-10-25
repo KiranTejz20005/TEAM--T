@@ -53,4 +53,44 @@ FinMDA-Bot automates these tasks to improve efficiency, accuracy, and auditabili
 - **Improved Insights:** Contextual commentary on peer performance and scenario projections.
 - **Enhanced UX:** Reviewers and auditors can inspect evidence for every claim quickly and easily.
 
----
+--- ## 🛠️ Conceptual Architecture
+
+FinMDA-Bot is designed as a modular, end-to-end system combining data ingestion, AI-powered analysis, and audit-ready reporting. The architecture ensures traceability, accuracy, and scalability.
+
+```mermaid
+flowchart TD
+    %% Data Ingestion
+    A1[Uploader] -->|Upload PDFs, Excel, CSV, API data| A2[Loader / Schema Validator]
+    A2 -->|Validate & Standardize| A3[KPI Engine]
+    A2 -->|Store Raw & Cleaned Data| A4[Document DB]
+
+    %% KPI & Metrics Computation
+    A3 -->|Compute Ratios & Metrics| A5[KPI Results]
+    A5 --> A4
+    A5 --> A6[Numeric Validator]
+
+    %% Vectorization & Retrieval
+    A4 --> A7[Vectorizer / ChromaDB]
+    A7 --> A8[RAG Retriever]
+
+    %% Prompt Generation & LLM
+    A8 --> A9[Prompt Builder]
+    A9 --> A10[LLM (OpenAI / Llama.cpp)]
+    A10 --> A6
+    A6 --> A11[Draft Validator / Guardrails]
+
+    %% User Interaction & Outputs
+    A11 --> A12[Frontend Editor / Chat UI]
+    A12 -->|Interactive Q&A| A10
+    A12 -->|Export MD&A Reports| A13[Export Module (PDF/DOCX)]
+    
+    %% Advanced Modules
+    A5 --> A14[Peer Benchmarking Engine]
+    A5 --> A15[Scenario & Sensitivity Builder]
+    A14 --> A10
+    A15 --> A10
+
+    %% Provenance & Audit Trail
+    A4 --> A16[Audit Trail & Evidence Tracker]
+    A16 --> A11
+
