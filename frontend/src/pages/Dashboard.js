@@ -4,7 +4,7 @@ import {
   FiTrendingUp, 
   FiDollarSign, 
   FiFileText, 
-  FiBarChart as FiBarChart3,
+  FiBarChart2,
   FiUpload,
   FiMessageSquare,
   FiMic,
@@ -71,7 +71,7 @@ const Dashboard = () => {
     {
       title: 'View Analytics',
       description: 'Financial analysis and insights',
-      icon: FiBarChart3,
+      icon: FiBarChart2,
       color: 'bg-warning-500',
       href: '/analytics',
       action: () => toast.success('Navigate to Analytics page')
@@ -129,7 +129,7 @@ const Dashboard = () => {
       value: stats.totalAnalytics,
       change: '+15%',
       changeType: 'positive',
-      icon: FiBarChart3,
+      icon: FiBarChart2,
       color: 'text-warning-500'
     },
     {

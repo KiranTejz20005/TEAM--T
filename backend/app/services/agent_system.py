@@ -3,6 +3,8 @@ Multi-agent system for financial analysis and conversation.
 """
 from typing import Dict, Any, Optional, List
 import google.generativeai as genai
+import json
+from datetime import datetime
 
 from app.config import settings
 
@@ -12,8 +14,7 @@ class AgentSystem:
 
     def __init__(self):
         genai.configure(api_key=settings.gemini_api_key)
-        # Use a broadly supported model name for the Python client.
-        self.model = genai.GenerativeModel("gemini-1.5-pro")
+        self.model = genai.GenerativeModel("gemini-1.5-flash")
 
     async def process_query(
         self,
@@ -48,9 +49,16 @@ class AgentSystem:
             }
 
     def _build_prompt(self, query: str, context: str) -> str:
+        """Build prompt for Gemini with system instructions and context."""
         system_instruction = (
-            "You are FinMDA-Bot, an expert financial AI assistant. "
+            "You are FinMDA-Bot, an expert financial AI assistant specializing in:\n"
+            "- Financial statement analysis\n"
+            "- MD&A (Management Discussion & Analysis) generation\n"
+            "- KPI calculation and interpretation\n"
+            "- Financial ratio analysis\n"
+            "- Trend identification and forecasting\n\n"
             "Provide clear, accurate, and professional responses. "
+            "Always cite specific numbers when available. "
             "If information is insufficient, ask for clarification."
         )
 
@@ -59,11 +67,64 @@ class AgentSystem:
                 f"{system_instruction}\n\n"
                 f"Context from documents:\n{context}\n\n"
                 f"User Question: {query}\n\n"
-                f"Answer using only the provided context when possible."
+                f"Answer using only the provided context when possible. "
+                f"Cite specific figures and provide clear explanations."
             )
         return f"{system_instruction}\n\nUser Question: {query}"
 
     def _extract_citations(self, context: str) -> List[Dict[str, Any]]:
+        """Extract citations from context."""
         if context:
             return [{"source": "document_context", "relevance_score": 0.9}]
         return []
+    
+    async def generate_md_a_section(
+        self,
+        section_type: str,
+        financial_data: Dict[str, Any],
+        context: str = ""
+    ) -> Dict[str, Any]:
+        """Generate a specific MD&A section."""
+        
+        prompts = {
+            "executive_summary": (
+                "Generate an executive summary for the MD&A report based on the following financial data:\n"
+                f"{json.dumps(financial_data, indent=2)}\n\n"
+                "Include: Overall performance, key drivers, major challenges, strategic outlook.\n"
+                "Keep it concise (2-3 paragraphs) and professional."
+            ),
+            "results_of_operations": (
+                "Generate a 'Results of Operations' section based on:\n"
+                f"{json.dumps(financial_data, indent=2)}\n\n"
+                "Focus on: Revenue analysis, cost structure, profitability trends, operational performance.\n"
+                "Provide specific numbers and percentages."
+            ),
+            "liquidity": (
+                "Generate a 'Liquidity and Capital Resources' section based on:\n"
+                f"{json.dumps(financial_data, indent=2)}\n\n"
+                "Cover: Liquidity position, cash generation, debt levels, capital allocation."
+            ),
+            "risks": (
+                "Generate a 'Risk Factors' section based on:\n"
+                f"{json.dumps(financial_data, indent=2)}\n\n"
+                "Identify: Financial risks, operational risks, regulatory risks, market risks."
+            )
+        }
+        
+        prompt = prompts.get(section_type, prompts["executive_summary"])
+        
+        try:
+            response = self.model.generate_content(prompt)
+            text = getattr(response, "text", "")
+            
+            return {
+                "section_type": section_type,
+                "content": text,
+                "success": True
+            }
+        except Exception as e:
+            return {
+                "section_type": section_type,
+                "content": f"Error generating section: {str(e)}",
+                "success": False
+            }

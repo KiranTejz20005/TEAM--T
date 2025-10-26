@@ -3,7 +3,7 @@ import {
   FiUser, 
   FiBell, 
   FiShield, 
-  FiDroplet as FiPalette, 
+  FiDroplet, 
   FiGlobe,
   FiSave,
   FiRefreshCw,
@@ -58,7 +58,7 @@ const Settings = () => {
     { id: 'general', label: 'General', icon: FiUser },
     { id: 'notifications', label: 'Notifications', icon: FiBell },
     { id: 'privacy', label: 'Privacy & Security', icon: FiShield },
-    { id: 'appearance', label: 'Appearance', icon: FiPalette },
+    { id: 'appearance', label: 'Appearance', icon: FiDroplet },
     { id: 'voice', label: 'Voice Settings', icon: FiGlobe }
   ];
 

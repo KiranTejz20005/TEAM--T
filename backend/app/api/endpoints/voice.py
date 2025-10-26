@@ -6,6 +6,10 @@ from typing import Dict, Any, Optional
 import logging
 
 from app.services.voice_assistant import VoiceAssistant
+<<<<<<< HEAD
+=======
+from app.schemas import ChatRequest, ChatResponse
+>>>>>>> 5c3a0a0f3539fc0d352cb6c8a94fa282129f33e9
 from app.database import get_db
 from sqlalchemy.orm import Session
 

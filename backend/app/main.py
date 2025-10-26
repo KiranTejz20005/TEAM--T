@@ -10,7 +10,7 @@ import os
 
 from app.config import settings
 from app.database import create_tables, get_db
-from app.api.endpoints import documents, chat, analytics, health, voice, faq
+from app.api.endpoints import documents, chat, analytics, health, voice, faq, mda
 from app.schemas import HealthResponse
 
 
@@ -38,6 +38,7 @@ app.include_router(chat.router, prefix="/api/v1/chat", tags=["chat"])
 app.include_router(analytics.router, prefix="/api/v1/analytics", tags=["analytics"])
 app.include_router(voice.router, prefix="/api/v1/voice", tags=["voice"])
 app.include_router(faq.router, prefix="/api/v1/faq", tags=["faq"])
+app.include_router(mda.router, prefix="/api/v1/mda", tags=["mda"])
 app.include_router(health.router, prefix="/api/v1", tags=["health"])
 
 

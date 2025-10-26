@@ -8,7 +8,7 @@ import {
   FiDownload,
   FiRefreshCw,
   FiUser,
-  FiCpu as FiBot
+  FiCpu
 } from 'react-icons/fi';
 import { useAppStore } from '../store/appStore';
 import { chatAPI } from '../services/api';
@@ -16,6 +16,8 @@ import toast from 'react-hot-toast';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
+
+const FiBot = FiCpu;
 
 const Chat = () => {
   const [message, setMessage] = useState('');

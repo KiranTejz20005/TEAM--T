@@ -17,7 +17,7 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from langchain.schema import Document
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain.vectorstores import ChromaDB
+from langchain.vectorstores import Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 from app.services.rag_service import RAGService
@@ -67,7 +67,7 @@ class MDAGenerator:
         self.logger = logging.getLogger(__name__)
         genai.configure(api_key=settings.gemini_api_key)
         self.llm = ChatGoogleGenerativeAI(
-            model="gemini-pro",
+            model="gemini-1.5-flash",
             temperature=0.3,
             google_api_key=settings.gemini_api_key
         )

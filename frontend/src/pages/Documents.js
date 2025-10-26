@@ -25,96 +25,60 @@ const Documents = () => {
   const { data: documentsData, isLoading, error } = useQuery(
     'documents',
     async () => {
-      const response = await documentAPI.getAll();
-      return response.data;
+      try {
+        const response = await documentAPI.getAll();
+        return response.data || [];
+      } catch (err) {
+        console.error('Error fetching documents:', err);
+        return [];
+      }
     },
     { retry: 1 }
   );
 
-  const documents = documentsData || [];
+  const documents = Array.isArray(documentsData) ? documentsData : [];
 
   // Upload mutation
   const uploadMutation = useMutation(
     async (file) => {
       const formData = new FormData();
       formData.append('file', file);
+      
       const response = await documentAPI.upload(formData);
       return response.data;
     },
     {
       onSuccess: (data) => {
-        toast.success('Document uploaded successfully');
+        toast.success('Document uploaded successfully!');
         queryClient.invalidateQueries('documents');
-        if (addDocument) {
-          addDocument(data);
-        }
+        setUploading(false);
       },
       onError: (error) => {
-        const errorMessage = error?.response?.data?.detail || 'Failed to upload document';
-        toast.error(errorMessage);
+        toast.error('Failed to upload document');
         console.error('Upload error:', error);
+        setUploading(false);
       }
     }
   );
 
   // Delete mutation
   const deleteMutation = useMutation(
-    async (id) => documentAPI.delete(id),
+    (id) => documentAPI.delete(id),
     {
       onSuccess: () => {
         toast.success('Document deleted successfully');
         queryClient.invalidateQueries('documents');
       },
-      onError: (error) => {
+      onError: () => {
         toast.error('Failed to delete document');
-        console.error('Delete error:', error);
       }
     }
   );
 
-  // Process mutation
-  const processMutation = useMutation(
-    async (id) => documentAPI.process(id),
-    {
-      onSuccess: () => {
-        toast.success('Document processed successfully');
-        queryClient.invalidateQueries('documents');
-      },
-      onError: (error) => {
-        toast.error('Failed to process document');
-        console.error('Process error:', error);
-      }
-    }
-  );
-
-  const onDrop = useCallback(async (acceptedFiles) => {
-    if (acceptedFiles.length === 0) return;
-
-    const file = acceptedFiles[0];
-    setUploading(true);
-    setUploadProgress(0);
-
-    try {
-      // Simulate upload progress
-      const progressInterval = setInterval(() => {
-        setUploadProgress(prev => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return prev;
-          }
-          return prev + 10;
-        });
-      }, 200);
-
-      await uploadMutation.mutateAsync(file);
-      
-      clearInterval(progressInterval);
-      setUploadProgress(100);
-    } catch (error) {
-      console.error('Upload failed:', error);
-    } finally {
-      setUploading(false);
-      setUploadProgress(0);
+  const onDrop = useCallback((acceptedFiles) => {
+    if (acceptedFiles.length > 0) {
+      setUploading(true);
+      uploadMutation.mutate(acceptedFiles[0]);
     }
   }, [uploadMutation]);
 
@@ -126,208 +90,166 @@ const Documents = () => {
       'application/vnd.ms-excel': ['.xls'],
       'text/csv': ['.csv']
     },
-    maxFiles: 1,
-    maxSize: 50 * 1024 * 1024 // 50MB
+    maxSize: 50 * 1024 * 1024, // 50MB
+    multiple: false
   });
 
-  const getFileIcon = (filename) => {
-    const extension = filename.split('.').pop().toLowerCase();
-    switch (extension) {
-      case 'pdf':
-        return <FiFileText className="text-error-500" />;
-      case 'xlsx':
-      case 'xls':
-        return <FiFile className="text-success-500" />;
-      case 'csv':
-        return <FiFile className="text-warning-500" />;
-      default:
-        return <FiFile className="text-gray-500" />;
+  const handleDelete = (id) => {
+    if (window.confirm('Are you sure you want to delete this document?')) {
+      deleteMutation.mutate(id);
     }
+  };
+
+  const getFileIcon = (filename) => {
+    const ext = filename?.split('.').pop()?.toLowerCase();
+    if (ext === 'pdf') return <FiFileText className="text-red-500" />;
+    if (ext === 'xlsx' || ext === 'xls') return <FiFile className="text-green-500" />;
+    if (ext === 'csv') return <FiFile className="text-blue-500" />;
+    return <FiFile className="text-gray-500" />;
   };
 
   const getStatusIcon = (status) => {
-    switch (status) {
-      case 'processed':
-        return <FiCheckCircle className="text-success-500" />;
-      case 'processing':
-        return <FiClock className="text-warning-500" />;
-      case 'error':
-        return <FiAlertCircle className="text-error-500" />;
-      default:
-        return <FiClock className="text-gray-500" />;
-    }
+    if (status === 'processed') return <FiCheckCircle className="text-green-500" />;
+    if (status === 'processing') return <FiClock className="text-yellow-500 animate-spin" />;
+    return <FiAlertCircle className="text-gray-500" />;
   };
 
   const formatFileSize = (bytes) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
+    if (!bytes) return 'N/A';
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return Math.round((bytes / Math.pow(1024, i)) * 100) / 100 + ' ' + sizes[i];
   };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="text-center py-12">
-        <FiAlertCircle size={48} className="text-error-500 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Error Loading Documents</h3>
-        <p className="text-gray-600">Failed to load documents. Please try again.</p>
-      </div>
-    );
-  }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-7xl mx-auto">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Documents</h1>
-          <p className="text-gray-600">Upload and manage your financial documents</p>
-        </div>
-        <div className="text-sm text-gray-500">
-          {documents.length} documents
-        </div>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Documents</h1>
+        <p className="text-gray-600 mt-2">
+          Upload and manage your financial documents
+        </p>
       </div>
 
-      {/* Upload Area */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div
-          {...getRootProps()}
-          className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors duration-200 cursor-pointer ${
-            isDragActive
-              ? 'border-primary-500 bg-primary-50'
-              : 'border-gray-300 hover:border-gray-400'
-          } ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
-        >
-          <input {...getInputProps()} disabled={uploading} />
-          <div className="flex flex-col items-center">
-            <FiUpload size={48} className="text-gray-400 mb-4" />
-            {uploading ? (
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500 mx-auto mb-4"></div>
-                <p className="text-lg font-medium text-gray-900">Uploading...</p>
-                <p className="text-gray-600">Please wait while your document is being processed</p>
-              </div>
-            ) : isDragActive ? (
-              <div>
-                <p className="text-lg font-medium text-primary-600">Drop the file here</p>
-                <p className="text-gray-600">Release to upload</p>
-              </div>
-            ) : (
-              <div>
-                <p className="text-lg font-medium text-gray-900">Upload Financial Documents</p>
-                <p className="text-gray-600 mb-4">
-                  Drag and drop your PDF, Excel, or CSV files here, or click to browse
-                </p>
-                <div className="text-sm text-gray-500">
-                  Supported formats: PDF, XLSX, XLS, CSV (Max 50MB)
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Documents List */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Your Documents</h2>
-        </div>
-        
-        {!documents || documents.length === 0 ? (
-          <div className="text-center py-12">
-            <FiFileText size={48} className="text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No Documents Yet</h3>
-            <p className="text-gray-600 mb-4">Upload your first financial document to get started</p>
+      {/* Upload Zone */}
+      <div
+        {...getRootProps()}
+        className={`border-2 border-dashed rounded-lg p-12 text-center cursor-pointer transition-colors mb-8 ${
+          isDragActive
+            ? 'border-primary-500 bg-primary-50'
+            : 'border-gray-300 hover:border-primary-400'
+        }`}
+      >
+        <input {...getInputProps()} />
+        <FiUpload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+        {uploading ? (
+          <div>
+            <p className="text-lg font-medium text-gray-900">Uploading...</p>
+            <div className="mt-4 w-64 mx-auto h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div className="h-full bg-primary-500 animate-pulse" style={{ width: '50%' }}></div>
+            </div>
           </div>
         ) : (
-          <div className="divide-y divide-gray-200">
-            {documents.map((doc) => (
-              <div key={doc.id} className="px-6 py-4 hover:bg-gray-50 transition-colors duration-200">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex-shrink-0">
-                      {getFileIcon(doc.filename)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-medium text-gray-900 truncate">
-                        {doc.filename}
-                      </h3>
-                      <div className="flex items-center space-x-4 mt-1">
-                        <span className="text-xs text-gray-500">
-                          {formatFileSize(doc.file_size)}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          {formatDate(doc.upload_date)}
-                        </span>
-                        <div className="flex items-center space-x-1">
-                          {getStatusIcon(doc.is_processed ? 'processed' : 'pending')}
-                          <span className="text-xs text-gray-500 capitalize">
-                            {doc.is_processed ? 'Processed' : 'Pending'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => window.open(`/api/v1/documents/${doc.id}`, '_blank')}
-                      className="p-2 text-gray-400 hover:text-gray-600"
-                      title="View Details"
-                    >
-                      <FiEye size={16} />
-                    </button>
-                    
-                    <button
-                      onClick={() => deleteMutation.mutate(doc.id)}
-                      className="p-2 text-gray-400 hover:text-error-600"
-                      title="Delete"
-                    >
-                      <FiTrash2 size={16} />
-                    </button>
-                  </div>
-                </div>
-                
-                {doc.processing_error && (
-                  <div className="mt-2 p-2 bg-error-50 border border-error-200 rounded text-sm text-error-700">
-                    {doc.processing_error}
-                  </div>
-                )}
-              </div>
-            ))}
+          <div>
+            <p className="text-lg font-medium text-gray-900 mb-2">
+              {isDragActive
+                ? 'Drop the file here'
+                : 'Drag & drop a file here, or click to select'}
+            </p>
+            <p className="text-sm text-gray-600">
+              Supported formats: PDF, Excel (.xlsx, .xls), CSV (max 50MB)
+            </p>
           </div>
         )}
       </div>
 
-      {/* Tips */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h3 className="text-sm font-medium text-blue-900 mb-2">💡 Tips for Better Results</h3>
-        <ul className="text-sm text-blue-800 space-y-1">
-          <li>• Upload clear, high-quality PDF documents for better text extraction</li>
-          <li>• Use structured Excel files with clear headers for better data processing</li>
-          <li>• Ensure financial documents contain standard accounting terms</li>
-          <li>• Large files may take longer to process</li>
-        </ul>
-      </div>
+      {/* Documents List */}
+      {isLoading ? (
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading documents...</p>
+        </div>
+      ) : error ? (
+        <div className="text-center py-12">
+          <FiAlertCircle className="mx-auto h-12 w-12 text-red-500 mb-4" />
+          <p className="text-gray-900 font-medium">Failed to load documents</p>
+          <p className="text-gray-600 mt-2">Please try again later</p>
+        </div>
+      ) : documents.length === 0 ? (
+        <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+          <FiFileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+          <p className="text-gray-900 font-medium">No documents yet</p>
+          <p className="text-gray-600 mt-2">Upload your first document to get started</p>
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Document
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Size
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Uploaded
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {documents.map((doc) => (
+                <tr key={doc.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center">
+                        {getFileIcon(doc.filename)}
+                      </div>
+                      <div className="ml-4">
+                        <div className="text-sm font-medium text-gray-900">
+                          {doc.filename || 'Untitled'}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {doc.file_type || 'Unknown type'}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {formatFileSize(doc.file_size)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      {getStatusIcon(doc.status)}
+                      <span className="ml-2 text-sm text-gray-900 capitalize">
+                        {doc.status || 'pending'}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {doc.created_at ? new Date(doc.created_at).toLocaleDateString() : 'N/A'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button
+                      onClick={() => handleDelete(doc.id)}
+                      className="text-red-600 hover:text-red-900 ml-4"
+                      title="Delete"
+                    >
+                      <FiTrash2 size={18} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };

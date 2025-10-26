@@ -1,0 +1,23 @@
+# Core Framework
+fastapi==0.109.0
+uvicorn==0.27.0
+pydantic==2.5.3
+python-multipart==0.0.6
+python-dotenv==1.0.0
+
+# Database
+sqlalchemy==2.0.25
+
+# AI/ML Libraries - Google Gemini
+google-generativeai==0.3.2
+
+# Document Processing
+pdfplumber==0.10.3
+openpyxl==3.1.2
+
+# Web Scraping & HTTP
+requests==2.31.0
+httpx==0.26.0
+
+# Additional Dependencies
+aiofiles==23.2.1

@@ -26,7 +26,11 @@ class Document(Base):
     # Extracted content
     extracted_text = Column(Text, nullable=True)
     extracted_tables = Column(JSON, nullable=True)
+<<<<<<< HEAD
     document_metadata = Column(JSON, nullable=True)
+=======
+    metadata = Column(JSON, nullable=True)
+>>>>>>> 5c3a0a0f3539fc0d352cb6c8a94fa282129f33e9
     
     # Relationships
     chat_sessions = relationship("ChatSession", back_populates="document")
@@ -95,7 +99,11 @@ class DocumentChunk(Base):
     document_id = Column(Integer, ForeignKey("documents.id"), nullable=False)
     chunk_index = Column(Integer, nullable=False)
     content = Column(Text, nullable=False)
+<<<<<<< HEAD
     chunk_metadata = Column(JSON, nullable=True)
+=======
+    metadata = Column(JSON, nullable=True)
+>>>>>>> 5c3a0a0f3539fc0d352cb6c8a94fa282129f33e9
     embedding_id = Column(String(100), nullable=True)  # ChromaDB embedding ID
     
     # Chunk characteristics

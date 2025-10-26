@@ -4,7 +4,7 @@ import {
   FiTrendingUp, 
   FiTrendingDown, 
   FiDollarSign, 
-  FiBarChart2 as FiBarChart3,
+  FiBarChart2,
   FiPieChart,
   FiDownload,
   FiRefreshCw,
@@ -69,7 +69,7 @@ const Analytics = () => {
       value: analytics?.total_assets || 0,
       change: '+5.7%',
       changeType: 'positive',
-      icon: FiBarChart3,
+      icon: FiBarChart2,
       color: 'text-warning-500'
     },
     {
@@ -176,7 +176,7 @@ const Analytics = () => {
   if (error) {
     return (
       <div className="text-center py-12">
-        <FiBarChart3 size={48} className="text-error-500 mx-auto mb-4" />
+        <FiBarChart2 size={48} className="text-error-500 mx-auto mb-4" />
         <h3 className="text-lg font-medium text-gray-900 mb-2">Error Loading Analytics</h3>
         <p className="text-gray-600">Failed to load analytics data. Please try again.</p>
       </div>

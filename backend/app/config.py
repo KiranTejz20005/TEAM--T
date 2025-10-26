@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     debug: bool = True
     
     # API Keys
-    gemini_api_key: str
+    gemini_api_key: str = "default-key-change-in-env"
     
     # Database
     database_url: str = "sqlite:///./finmda.db"

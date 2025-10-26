@@ -4,7 +4,7 @@ import {
   FiHome, 
   FiMessageSquare, 
   FiFileText, 
-  FiBarChart2 as FiBarChart3, 
+  FiBarChart2, 
   FiHelpCircle, 
   FiMic, 
   FiSettings,
@@ -40,7 +40,7 @@ const Sidebar = () => {
     {
       name: 'Analytics',
       href: '/analytics',
-      icon: FiBarChart3,
+      icon: FiBarChart2,
       description: 'Financial analysis'
     },
     {

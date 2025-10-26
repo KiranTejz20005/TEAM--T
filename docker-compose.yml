@@ -43,7 +43,11 @@ services:
     environment:
       - DATABASE_URL=postgresql://finmda_user:finmda_password@postgres:5432/finmda_bot
       - REDIS_URL=redis://redis:6379
+<<<<<<< HEAD
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+=======
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+>>>>>>> 5c3a0a0f3539fc0d352cb6c8a94fa282129f33e9
       - CHROMA_DB_PATH=/app/chromadb
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
@@ -97,7 +101,11 @@ services:
     environment:
       - DATABASE_URL=postgresql://finmda_user:finmda_password@postgres:5432/finmda_bot
       - REDIS_URL=redis://redis:6379
+<<<<<<< HEAD
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+=======
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+>>>>>>> 5c3a0a0f3539fc0d352cb6c8a94fa282129f33e9
       - CHROMA_DB_PATH=/app/chromadb
     volumes:
       - ./backend:/app
@@ -121,7 +129,11 @@ services:
     environment:
       - DATABASE_URL=postgresql://finmda_user:finmda_password@postgres:5432/finmda_bot
       - REDIS_URL=redis://redis:6379
+<<<<<<< HEAD
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+=======
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+>>>>>>> 5c3a0a0f3539fc0d352cb6c8a94fa282129f33e9
       - CHROMA_DB_PATH=/app/chromadb
     volumes:
       - ./backend:/app
