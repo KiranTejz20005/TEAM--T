@@ -29,7 +29,7 @@
 * **Delayed Insights**: Slow reporting delays strategic decision-making
 * **High Costs**: Manual analysis is expensive and doesn't scale
 
----
+--
 
 ## 💡 Our Solution
 
